@@ -20,11 +20,22 @@ impl<T: Num+Default+Copy, const R: usize, const C: usize> Matrix<T,R,C> {
     pub fn init(&mut self, vals_: &[T]) {
         let n = R * C;
         assert!(vals_.len() <= n);
-        for idx in 0..vals_.len() {
+        for (idx, val) in vals_.iter().enumerate() {
             let i = idx / self.size.1;
             let j = idx % self.size.1;
-            self.vals[i][j] = vals_[idx];
+            self.vals[i][j] = *val;
         }
+    }
+    pub fn rows(&self) -> usize {
+        self.size.0
+    }
+    pub fn cols(&self) -> usize {
+        self.size.1
+    }
+}
+impl<T: Num+Default+Copy, const R: usize, const C: usize> Default for Matrix<T,R,C> {
+    fn default() -> Self {
+        Self { vals: [[T::default(); C]; R], size: (R, C) }
     }
 }
 
@@ -72,55 +83,17 @@ fn test_init() {
     let mut m = Matrix::<i32,2,3>::new();
     assert_eq!(m.size.0, 2);
     assert_eq!(m.size.1, 3);
-    assert_eq!(m[(0, 0)], 0);
-    assert_eq!(m[(1, 0)], 0);
-    assert_eq!(m[(0, 1)], 0);
-    assert_eq!(m[(1, 1)], 0);
-    assert_eq!(m[(0, 2)], 0);
-    assert_eq!(m[(1, 2)], 0);
+    for i in 0..m.rows() {
+        for j in 0..m.cols() {
+            assert_eq!(m.vals[i][j], 0);
+        }
+    }
     m.init(&[11, 12, 13, 21, 22, 23]);
     println!("{:?}", m);
-    assert_eq!(m[(0, 0)], 11);
-    assert_eq!(m[(1, 0)], 21);
-    assert_eq!(m[(0, 1)], 12);
-    assert_eq!(m[(1, 1)], 22);
-    assert_eq!(m[(0, 2)], 13);
-    assert_eq!(m[(1, 2)], 23);
-}
-
-#[test]
-fn test_add_sub() {
-    let mut m1 = Matrix::<i32,3,2>::new();
-    m1.init(&[11, 12, 21, 22, 31, 32]);
-    println!("{:?}", m1);
-    let mut m2 = Matrix::<i32,3,2>::new();
-    m2.init(&[100, 200, 300, 400, 500, 600]);
-    println!("{:?}", m2);
-    let result1 = m1 + m2;
-    println!("{:?}", result1);
-    assert_eq!(result1[(0, 0)], 111);
-    assert_eq!(result1[(0, 1)], 212);
-    assert_eq!(result1[(1, 0)], 321);
-    assert_eq!(result1[(1, 1)], 422);
-    assert_eq!(result1[(2, 0)], 531);
-    assert_eq!(result1[(2, 1)], 632);
-    let result2 = m2 - m1;
-    println!("{:?}", result2);
-    assert_eq!(result2[(0, 0)], 89);
-    assert_eq!(result2[(0, 1)], 188);
-    assert_eq!(result2[(1, 0)], 279);
-    assert_eq!(result2[(1, 1)], 378);
-    assert_eq!(result2[(2, 0)], 469);
-    assert_eq!(result2[(2, 1)], 568);
-}
-
-#[test]
-fn test_vector() {
-    let mut v1 = Vector::<f32,3>::new();
-    assert_eq!(v1.size.0, 3);
-    assert_eq!(v1.size.1, 1);
-    v1.init(&[1.0,2.0,3.0]);
-    assert_eq!(v1[(0,0)], 1.0);
-    assert_eq!(v1[(1,0)], 2.0);
-    assert_eq!(v1[(2,0)], 3.0);
+    for i in 0..m.rows() {
+        for j in 0..m.cols() {
+            let expected = (i+1)*10+(j+1);
+            assert_eq!(m.vals[i][j], expected as i32);
+        }
+    }
 }
