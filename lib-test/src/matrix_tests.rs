@@ -23,6 +23,14 @@ fn create() {
 }
 
 #[test]
+fn indexing() {
+	let mut m = Matrix::<f32,3,3>::new();
+	m[(1,2)] = 123.4;
+	m[(2,1)] = m[(1,2)] * 2.0;
+	assert_eq!(m[(2,1)], 123.4*2.0);
+}
+
+#[test]
 fn add_and_subtract() {
     let mut m1 = Matrix::<i32,3,2>::new();
     m1.init(&[11, 12, 21, 22, 31, 32]);
