@@ -12,7 +12,7 @@ fn new() {
     assert_eq!(m[(1, 1)], 0);
     assert_eq!(m[(0, 2)], 0);
     assert_eq!(m[(1, 2)], 0);
-    m.init(&[11, 12, 13, 21, 22, 23]);
+    m.set(&[11, 12, 13, 21, 22, 23]);
     println!("{:?}", m);
     assert_eq!(m[(0, 0)], 11);
     assert_eq!(m[(1, 0)], 21);
@@ -51,10 +51,10 @@ fn index_fail() {
 #[test]
 fn add_and_subtract() {
     let mut m1 = Matrix::<i32,3,2>::new();
-    m1.init(&[11, 12, 21, 22, 31, 32]);
+    m1.set(&[11, 12, 21, 22, 31, 32]);
     println!("{:?}", m1);
     let mut m2 = Matrix::<i32,3,2>::new();
-    m2.init(&[100, 200, 300, 400, 500, 600]);
+    m2.set(&[100, 200, 300, 400, 500, 600]);
     println!("{:?}", m2);
     let result1 = m1 + m2;
     println!("{:?}", result1);
@@ -79,4 +79,41 @@ fn identity() {
     let m3 = Matrix::<i32,3,2>::diagonal(1);
     let expected3 = Matrix::<i32,3,2>::new_init(&[1,0,0,1,0,0]);
     assert_eq!(m3, expected3);
+}
+
+#[test]
+fn transpose() {
+    let m1 = Matrix::<i32,3,2>::new_init(
+        &[11, 12,
+         21, 22,
+         31, 32]);
+    println!("{:?}", m1);
+    let m2 = m1.transpose();
+    assert_eq!(m2.rows(), 2);
+    assert_eq!(m2.cols(), 3);
+    let expected1 = Matrix::<i32,2,3>::new_init(
+        &[11, 21, 31,
+        12, 22, 32]);
+    assert_eq!(m2, expected1);
+
+    let m3 = Matrix::<u8,4,4>::diagonal(1);
+    let m4 = m3.transpose();
+    assert_eq!(m3, m4);
+
+    let t1 = m1.transpose().transpose();
+    assert_eq!(t1, m1);
+}
+
+#[test]
+fn scalar_add_and_subtract() {
+    let mut m1 = Matrix::<i32,3,2>::new();
+    m1.set(&[11, 12, 21, 22, 31, 32]);
+    println!("{:?}", m1);
+    let result1 = m1 + 4;
+    println!("{:?}", result1);
+    let expected_add = Matrix::<i32,3,2>::new_init(&[15, 16, 25, 26, 35, 36]);
+    assert_eq!(result1, expected_add);
+    let result2 = m1 - 4;
+    let expected_sub = Matrix::<i32,3,2>::new_init(&[7, 8, 17, 18, 27, 28]);
+    assert_eq!(result2, expected_sub);
 }

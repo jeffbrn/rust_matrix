@@ -43,7 +43,7 @@ impl<T: Num+Default+Copy, const R: usize, const C: usize> Matrix<T,R,C> {
         }
     }
 
-    pub fn init(&mut self, vals_: &[T]) {
+    pub fn set(&mut self, vals_: &[T]) {
         let n = R * C;
         assert!(vals_.len() <= n);
         for (idx, val) in vals_.iter().enumerate() {
@@ -57,6 +57,15 @@ impl<T: Num+Default+Copy, const R: usize, const C: usize> Matrix<T,R,C> {
     }
     pub fn cols(&self) -> usize {
         self.size.1
+    }
+    pub fn transpose(&self) -> Matrix<T,C,R> {
+        let mut retval = Matrix::<T,C,R>::new();
+        for i in 0..R {
+            for j in 0..C {
+                retval[(j,i)] = self[(i,j)];
+            }
+        }
+        retval
     }
 }
 impl<T: Num+Default+Copy, const R: usize, const C: usize> Default for Matrix<T,R,C> {
@@ -90,6 +99,19 @@ impl<T: Num+Default+Copy, const R: usize, const C: usize> std::ops::Add for Matr
         result
     }
 }
+impl<T: Num+Default+Copy, const R: usize, const C: usize> std::ops::Add<T> for Matrix<T,R,C> {
+    type Output = Matrix<T,R,C>;
+
+    fn add(self, rhs: T) -> Self::Output {
+        let mut result = Matrix::<T,R,C>::new();
+        for i in 0..R {
+            for j in 0..C  {
+                result[(i,j)] = self[(i,j)] + rhs;
+            }
+        }
+        result
+    }
+}
 impl<T: Num+Default+Copy, const R: usize, const C: usize> std::ops::Sub for Matrix<T,R,C> {
     type Output = Matrix<T,R,C>;
     
@@ -98,6 +120,19 @@ impl<T: Num+Default+Copy, const R: usize, const C: usize> std::ops::Sub for Matr
         for i in 0..R {
             for j in 0..C  {
                 result[(i,j)] = self[(i,j)] - rhs[(i,j)];
+            }
+        }
+        result
+    }
+}
+impl<T: Num+Default+Copy, const R: usize, const C: usize> std::ops::Sub<T> for Matrix<T,R,C> {
+    type Output = Matrix<T,R,C>;
+
+    fn sub(self, rhs: T) -> Self::Output {
+        let mut result = Matrix::<T,R,C>::new();
+        for i in 0..R {
+            for j in 0..C  {
+                result[(i,j)] = self[(i,j)] - rhs;
             }
         }
         result
@@ -114,7 +149,7 @@ fn test_init() {
             assert_eq!(m.vals[i][j], 0);
         }
     }
-    m.init(&[11, 12, 13, 21, 22, 23]);
+    m.set(&[11, 12, 13, 21, 22, 23]);
     println!("{:?}", m);
     for i in 0..m.rows() {
         for j in 0..m.cols() {
