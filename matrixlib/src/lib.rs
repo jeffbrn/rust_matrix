@@ -16,6 +16,32 @@ impl<T: Num+Default+Copy, const R: usize, const C: usize> Matrix<T,R,C> {
         };
         m
     }
+    pub fn new_init(vals_: &[T]) -> Matrix<T,R,C> {
+        let n = R * C;
+        assert!(vals_.len() <= n);
+        let mut data = [[T::default(); C]; R];
+        for (idx, val) in vals_.iter().enumerate() {
+            let i = idx / C;
+            let j = idx % C;
+            data[i][j] = *val;
+        }
+        let m: Matrix<T,R,C> = Matrix {
+            vals: data,
+            size: (R, C)
+        };
+        m
+    }
+    pub fn diagonal(val: T) -> Matrix<T,R,C> {
+        let n = std::cmp::min(R, C);
+        let mut data = [[T::default(); C]; R];
+        for i in 0..n {
+            data[i][i] = val;
+        }
+        Matrix {
+            vals: data,
+            size: (R, C)
+        }
+    }
 
     pub fn init(&mut self, vals_: &[T]) {
         let n = R * C;
@@ -96,4 +122,14 @@ fn test_init() {
             assert_eq!(m.vals[i][j], expected as i32);
         }
     }
+
+    let n = Matrix::<i32,2,3>::new_init(&[11, 12, 13, 21, 22, 23]);
+    for i in 0..n.rows() {
+        for j in 0..n.cols() {
+            let expected = (i+1)*10+(j+1);
+            assert_eq!(n.vals[i][j], expected as i32);
+        }
+    }
+
+    assert_eq!(m, n);
 }
