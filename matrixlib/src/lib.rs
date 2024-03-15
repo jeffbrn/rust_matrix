@@ -1,5 +1,6 @@
 use std::usize;
 use num_traits::Num;
+use std::ops::{Add, Mul, Sub};
 
 #[derive(Debug,Copy,Clone,PartialEq,Eq)]
 pub struct Matrix<T, const R: usize, const C: usize> where T : Num {
@@ -58,6 +59,7 @@ impl<T: Num+Default+Copy, const R: usize, const C: usize> Matrix<T,R,C> {
     pub fn cols(&self) -> usize {
         self.size.1
     }
+    
     pub fn transpose(&self) -> Matrix<T,C,R> {
         let mut retval = Matrix::<T,C,R>::new();
         for i in 0..R {
@@ -68,6 +70,18 @@ impl<T: Num+Default+Copy, const R: usize, const C: usize> Matrix<T,R,C> {
         retval
     }
 }
+impl<T: Num+Default+Copy+Mul, const R: usize, const C: usize> Matrix<T,R,C> {
+    pub fn dot(&self, other: &Vector<T,R>) -> T {
+        if self.size.1 > 1 { panic!("only valid for vectors"); }
+        let mut sum = T::default();
+        for i in 0..R {
+            let x = self.vals[i][0] * other.vals[i][0];
+            sum = sum + x;
+        }
+        sum
+    }
+}
+
 impl<T: Num+Default+Copy, const R: usize, const C: usize> Default for Matrix<T,R,C> {
     fn default() -> Self {
         Self { vals: [[T::default(); C]; R], size: (R, C) }
@@ -81,12 +95,27 @@ impl<T: Num, const R: usize, const C: usize> std::ops::Index<(usize, usize)> for
         &self.vals[index.0][index.1]
     }
 }
+impl<T: Num, const R: usize, const C: usize> std::ops::Index<usize> for Matrix<T,R,C> {
+    type Output = T;
+    
+    fn index(&self, index: usize) -> &Self::Output {
+        if self.size.1 > 1 { panic!("only valid for vectors"); }
+        &self.vals[index][0]
+    }
+}
 impl<T: Num, const R: usize, const C: usize> std::ops::IndexMut<(usize, usize)> for Matrix<T,R,C> {
     fn index_mut(&mut self, index: (usize, usize)) -> &mut Self::Output {
         &mut self.vals[index.0][index.1]
     }
 }
-impl<T: Num+Default+Copy, const R: usize, const C: usize> std::ops::Add for Matrix<T,R,C> {
+impl<T: Num, const R: usize, const C: usize> std::ops::IndexMut<usize> for Matrix<T,R,C> {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        if self.size.1 > 1 { panic!("only valid for vectors"); }
+        &mut self.vals[index][0]
+    }
+}
+
+impl<T: Num+Default+Copy, const R: usize, const C: usize> Add for Matrix<T,R,C> {
     type Output = Matrix<T,R,C>;
 
     fn add(self, rhs: Self) -> Self::Output {
@@ -99,7 +128,7 @@ impl<T: Num+Default+Copy, const R: usize, const C: usize> std::ops::Add for Matr
         result
     }
 }
-impl<T: Num+Default+Copy, const R: usize, const C: usize> std::ops::Add<T> for Matrix<T,R,C> {
+impl<T: Num+Default+Copy, const R: usize, const C: usize> Add<T> for Matrix<T,R,C> {
     type Output = Matrix<T,R,C>;
 
     fn add(self, rhs: T) -> Self::Output {
@@ -112,7 +141,7 @@ impl<T: Num+Default+Copy, const R: usize, const C: usize> std::ops::Add<T> for M
         result
     }
 }
-impl<T: Num+Default+Copy, const R: usize, const C: usize> std::ops::Sub for Matrix<T,R,C> {
+impl<T: Num+Default+Copy, const R: usize, const C: usize> Sub for Matrix<T,R,C> {
     type Output = Matrix<T,R,C>;
     
     fn sub(self, rhs: Self) -> Self::Output {
@@ -125,7 +154,7 @@ impl<T: Num+Default+Copy, const R: usize, const C: usize> std::ops::Sub for Matr
         result
     }
 }
-impl<T: Num+Default+Copy, const R: usize, const C: usize> std::ops::Sub<T> for Matrix<T,R,C> {
+impl<T: Num+Default+Copy, const R: usize, const C: usize> Sub<T> for Matrix<T,R,C> {
     type Output = Matrix<T,R,C>;
 
     fn sub(self, rhs: T) -> Self::Output {
@@ -133,6 +162,37 @@ impl<T: Num+Default+Copy, const R: usize, const C: usize> std::ops::Sub<T> for M
         for i in 0..R {
             for j in 0..C  {
                 result[(i,j)] = self[(i,j)] - rhs;
+            }
+        }
+        result
+    }
+}
+impl<T: Num+Default+Copy+Mul, const R: usize, const C: usize> Mul<T> for Matrix<T,R,C> {
+    type Output = Matrix<T,R,C>;
+    
+    fn mul(self, rhs: T) -> Self::Output {
+        let mut result = Matrix::<T,R,C>::new();
+        for i in 0..R {
+            for j in 0..C  {
+                result[(i,j)] = self[(i,j)] * rhs;
+            }
+        }
+        result
+    }
+
+}
+impl<T: Num+Default+Copy+Mul, const M: usize, const N: usize, const K: usize> Mul<Matrix<T,N,K>> for Matrix<T,M,N> {
+    type Output = Matrix<T,M,K>;
+
+    fn mul(self, rhs: Matrix<T,N,K>) -> Self::Output {
+        let mut result = Matrix::<T,M,K>::new();
+        for i in 0..M {
+            for j in 0..K  {
+                let mut sum = T::default();
+                for n in 0..N {
+                    sum = sum + self[(i,n)] * rhs[(n, j)];
+                }
+                result[(i,j)] = sum;
             }
         }
         result

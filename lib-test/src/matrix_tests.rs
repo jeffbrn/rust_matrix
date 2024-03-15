@@ -49,6 +49,13 @@ fn index_fail() {
 }
 
 #[test]
+#[should_panic(expected = "only valid for vectors")]
+fn index_fail_not_vector() {
+	let m = Matrix::<f32,3,3>::new();
+    let _x = m[2];
+}
+
+#[test]
 fn add_and_subtract() {
     let mut m1 = Matrix::<i32,3,2>::new();
     m1.set(&[11, 12, 21, 22, 31, 32]);
@@ -116,4 +123,33 @@ fn scalar_add_and_subtract() {
     let result2 = m1 - 4;
     let expected_sub = Matrix::<i32,3,2>::new_init(&[7, 8, 17, 18, 27, 28]);
     assert_eq!(result2, expected_sub);
+}
+
+#[test]
+fn scalar_mult() {
+    let m = Matrix::<i32,3,2>::new_init(&[11, 12, 21, 22, 31, 32]);
+    let result = m * 2;
+    let expected = Matrix::<i32,3,2>::new_init(&[22, 24, 42, 44, 62, 64]);
+    assert_eq!(result, expected);
+}
+
+#[test]
+fn mult() {
+    let m1 = Matrix::<i32,3,2>::new_init(&[3,4,-1,2,0,4]);
+    let m2 = Matrix::<i32,2,2>::new_init(&[5,1,3,1]);
+    let expected1 = Matrix::<i32,3,2>::new_init(&[27,7,1,1,12,4]);
+    let result1 = m1 * m2;
+    assert_eq!(result1, expected1);
+
+    let m3 = Matrix::<i16,2,3>::new_init(&[3,0,3,1,1,0]);
+    let m4 = Matrix::<i16,3,2>::new_init(&[4,4,0,1,4,1]);
+    let expected2 = Matrix::<i16,2,2>::new_init(&[24,15,4,5]);
+    let result2 = m3 * m4;
+    assert_eq!(result2, expected2);
+
+    let m5 = Matrix::<i16,2,3>::new_init(&[3,4,0,0,4,1]);
+    let m6 = Matrix::<i16,3,3>::new_init(&[2,-1,2,4,0,0,0,1,1]);
+    let expected3 = Matrix::<i16,2,3>::new_init(&[22,-3,6,16,1,1]);
+    let result3 = m5 * m6;
+    assert_eq!(result3, expected3);
 }
