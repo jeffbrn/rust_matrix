@@ -1,3 +1,5 @@
+pub mod vector;
+
 use std::usize;
 use num_traits::Num;
 use std::ops::{Add, Mul, Sub};
@@ -7,7 +9,6 @@ pub struct Matrix<T, const R: usize, const C: usize> where T : Num {
     vals: [[T; C]; R],
     size: (usize, usize),
 }
-pub type Vector<T,const R:usize> = Matrix<T,R,1>;
 
 impl<T: Num+Default+Copy, const R: usize, const C: usize> Matrix<T,R,C> {
     pub fn new() -> Matrix<T,R,C> {
@@ -68,17 +69,6 @@ impl<T: Num+Default+Copy, const R: usize, const C: usize> Matrix<T,R,C> {
             }
         }
         retval
-    }
-}
-impl<T: Num+Default+Copy+Mul, const R: usize, const C: usize> Matrix<T,R,C> {
-    pub fn dot(&self, other: &Vector<T,R>) -> T {
-        if self.size.1 > 1 { panic!("only valid for vectors"); }
-        let mut sum = T::default();
-        for i in 0..R {
-            let x = self.vals[i][0] * other.vals[i][0];
-            sum = sum + x;
-        }
-        sum
     }
 }
 

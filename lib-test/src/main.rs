@@ -1,7 +1,7 @@
 mod vector_tests;
 mod matrix_tests;
 
-use matrixlib::Vector;
+use matrixlib::vector::Vector;
 
 fn main() {
     println!("Hello, world!");

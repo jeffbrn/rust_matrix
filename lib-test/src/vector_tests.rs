@@ -1,5 +1,5 @@
 #[cfg(test)]
-use matrixlib::{Vector, Matrix};
+use matrixlib::{vector::Vector, Matrix};
 
 #[test]
 fn test_new() {
@@ -41,12 +41,4 @@ fn dot_product() {
     let v = Vector::<i32,3>::new_init(&data);
     let dp = v.dot(&v);
     assert_eq!(dp, 29);
-}
-
-#[test]
-#[should_panic(expected = "only valid for vectors")]
-fn dot_product_on_matrix() {
-	let m = Matrix::<f32,3,3>::new();
-    let v = Vector::<f32,3>::new();
-    let _x = m.dot(&v);
 }
