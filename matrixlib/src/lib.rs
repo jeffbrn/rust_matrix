@@ -36,6 +36,7 @@ impl<T: Num+Default+Copy, const R: usize, const C: usize> Matrix<T,R,C> {
     pub fn diagonal(val: T) -> Matrix<T,R,C> {
         let n = std::cmp::min(R, C);
         let mut data = [[T::default(); C]; R];
+        #[allow(clippy::needless_range_loop)]
         for i in 0..n {
             data[i][i] = val;
         }
@@ -85,23 +86,9 @@ impl<T: Num, const R: usize, const C: usize> std::ops::Index<(usize, usize)> for
         &self.vals[index.0][index.1]
     }
 }
-impl<T: Num, const R: usize, const C: usize> std::ops::Index<usize> for Matrix<T,R,C> {
-    type Output = T;
-    
-    fn index(&self, index: usize) -> &Self::Output {
-        if self.size.1 > 1 { panic!("only valid for vectors"); }
-        &self.vals[index][0]
-    }
-}
 impl<T: Num, const R: usize, const C: usize> std::ops::IndexMut<(usize, usize)> for Matrix<T,R,C> {
     fn index_mut(&mut self, index: (usize, usize)) -> &mut Self::Output {
         &mut self.vals[index.0][index.1]
-    }
-}
-impl<T: Num, const R: usize, const C: usize> std::ops::IndexMut<usize> for Matrix<T,R,C> {
-    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
-        if self.size.1 > 1 { panic!("only valid for vectors"); }
-        &mut self.vals[index][0]
     }
 }
 

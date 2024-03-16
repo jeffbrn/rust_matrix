@@ -49,13 +49,6 @@ fn index_fail() {
 }
 
 #[test]
-#[should_panic(expected = "only valid for vectors")]
-fn index_fail_not_vector() {
-	let m = Matrix::<f32,3,3>::new();
-    let _x = m[2];
-}
-
-#[test]
 fn add_and_subtract() {
     let mut m1 = Matrix::<i32,3,2>::new();
     m1.set(&[11, 12, 21, 22, 31, 32]);
